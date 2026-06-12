@@ -1,10 +1,12 @@
+import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { averageMs, formatDuration, recentNights } from '../lib/stats';
-import { colors } from '../lib/theme';
+import { colors, microLabel, space, type } from '../lib/theme';
 import { SleepSession } from '../lib/types';
 import NightCard from './NightCard';
 import WeeklyChart from './WeeklyChart';
+import { GlassCard } from './ui';
 
 export default function HistoryScreen({ sessions }: { sessions: SleepSession[] }) {
   const week = recentNights(sessions, 7);
@@ -12,10 +14,12 @@ export default function HistoryScreen({ sessions }: { sessions: SleepSession[] }
   if (week.length === 0) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.emptyEmoji}>🛌</Text>
-        <Text style={styles.emptyTitle}>No nights tracked yet</Text>
+        <View style={styles.emptyIcon}>
+          <Feather name="bar-chart-2" size={26} color={colors.textDim} />
+        </View>
+        <Text style={styles.emptyTitle}>Nothing here yet</Text>
         <Text style={styles.emptyText}>
-          Your sleep history and weekly analysis will show up here after your first night.
+          After your first night, your weekly rhythm and night-by-night details appear here.
         </Text>
       </View>
     );
@@ -26,16 +30,16 @@ export default function HistoryScreen({ sessions }: { sessions: SleepSession[] }
   const nightsWithGaps = week.filter(n => n.awakeMs > 0).length;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.summaryRow}>
-        <SummaryCard label="Avg sleep" value={formatDuration(avgSleep)} />
-        <SummaryCard label="Avg awake in bed" value={formatDuration(avgAwake)} />
-        <SummaryCard label="Restless nights" value={`${nightsWithGaps}/${week.length}`} />
+        <SummaryTile label="Avg sleep" value={formatDuration(avgSleep)} />
+        <SummaryTile label="Avg awake" value={formatDuration(avgAwake)} />
+        <SummaryTile label="Restless" value={`${nightsWithGaps} of ${week.length}`} />
       </View>
 
       <WeeklyChart nights={week} />
 
-      <Text style={styles.sectionTitle}>Night by night</Text>
+      <Text style={[microLabel, styles.sectionLabel]}>Night by night</Text>
       {[...week].reverse().map(night => (
         <NightCard key={night.session.id} night={night} />
       ))}
@@ -43,69 +47,74 @@ export default function HistoryScreen({ sessions }: { sessions: SleepSession[] }
   );
 }
 
-function SummaryCard({ label, value }: { label: string; value: string }) {
+function SummaryTile({ label, value }: { label: string; value: string }) {
   return (
-    <View style={styles.summaryCard}>
+    <GlassCard style={styles.summaryTile}>
       <Text style={styles.summaryValue}>{value}</Text>
       <Text style={styles.summaryLabel}>{label}</Text>
-    </View>
+    </GlassCard>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    gap: 14,
+    padding: space.lg,
+    gap: space.md,
+    paddingBottom: space.xxl,
   },
   summaryRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: space.sm,
   },
-  summaryCard: {
+  summaryTile: {
     flex: 1,
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 12,
     alignItems: 'center',
     gap: 4,
+    paddingVertical: space.md,
+    paddingHorizontal: space.sm,
   },
   summaryValue: {
+    fontFamily: type.light,
+    fontSize: 21,
     color: colors.text,
-    fontSize: 17,
-    fontWeight: '700',
   },
   summaryLabel: {
-    color: colors.textDim,
-    fontSize: 11,
-    textAlign: 'center',
+    fontFamily: type.regular,
+    fontSize: 11.5,
+    color: colors.textFaint,
   },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '700',
-    marginTop: 6,
+  sectionLabel: {
+    marginTop: space.md,
+    marginLeft: 2,
   },
   empty: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
-    gap: 10,
+    paddingHorizontal: 48,
+    gap: space.sm,
   },
-  emptyEmoji: {
-    fontSize: 48,
+  emptyIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.glass,
+    borderColor: colors.hairline,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: space.sm,
   },
   emptyTitle: {
-    color: colors.text,
+    fontFamily: type.semibold,
     fontSize: 18,
-    fontWeight: '700',
+    color: colors.text,
   },
   emptyText: {
-    color: colors.textDim,
+    fontFamily: type.regular,
     fontSize: 14,
+    lineHeight: 21,
+    color: colors.textDim,
     textAlign: 'center',
-    lineHeight: 20,
   },
 });

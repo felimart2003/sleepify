@@ -1,3 +1,14 @@
+import {
+  Inter_300Light,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  useFonts,
+} from '@expo-google-fonts/inter';
+import { Feather } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -5,12 +16,20 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import HistoryScreen from './components/HistoryScreen';
 import TonightScreen from './components/TonightScreen';
 import { loadSessions, saveSessions } from './lib/storage';
-import { colors } from './lib/theme';
+import { colors, gradients, palette, radius, space, type } from './lib/theme';
 import { SleepSession } from './lib/types';
 
 type Tab = 'tonight' | 'history';
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+
   const [sessions, setSessions] = useState<SleepSession[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [tab, setTab] = useState<Tab>('tonight');
@@ -70,101 +89,121 @@ export default function App() {
     update(sessions.filter(s => s.id !== activeSession.id));
   };
 
+  if (!fontsLoaded) {
+    return <View style={{ flex: 1, backgroundColor: palette.night0 }} />;
+  }
+
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.root}>
-        <StatusBar style="light" />
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Sleepify</Text>
-        </View>
+      <LinearGradient colors={gradients.backdrop} style={styles.backdrop}>
+        <SafeAreaView style={styles.root}>
+          <StatusBar style="light" />
 
-        <View style={styles.content}>
-          {!loaded ? null : tab === 'tonight' ? (
-            <TonightScreen
-              activeSession={activeSession}
-              lastCompleted={lastCompleted}
-              onGoToSleep={goToSleep}
-              onStillAwake={stillAwake}
-              onWakeUp={wakeUp}
-              onCancelNight={cancelNight}
-            />
-          ) : (
-            <HistoryScreen sessions={sessions} />
-          )}
-        </View>
+          <View style={styles.content}>
+            {!loaded ? null : tab === 'tonight' ? (
+              <TonightScreen
+                activeSession={activeSession}
+                lastCompleted={lastCompleted}
+                onGoToSleep={goToSleep}
+                onStillAwake={stillAwake}
+                onWakeUp={wakeUp}
+                onCancelNight={cancelNight}
+              />
+            ) : (
+              <HistoryScreen sessions={sessions} />
+            )}
+          </View>
 
-        <View style={styles.tabBar}>
-          <TabButton
-            label="🌙 Tonight"
-            active={tab === 'tonight'}
-            onPress={() => setTab('tonight')}
-          />
-          <TabButton
-            label="📊 History"
-            active={tab === 'history'}
-            onPress={() => setTab('history')}
-          />
-        </View>
-      </SafeAreaView>
+          <View style={styles.tabBarWrap} pointerEvents="box-none">
+            <View style={styles.tabBar}>
+              <TabButton
+                icon="moon"
+                label="Tonight"
+                active={tab === 'tonight'}
+                onPress={() => setTab('tonight')}
+              />
+              <TabButton
+                icon="bar-chart-2"
+                label="History"
+                active={tab === 'history'}
+                onPress={() => setTab('history')}
+              />
+            </View>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
     </SafeAreaProvider>
   );
 }
 
 function TabButton({
+  icon,
   label,
   active,
   onPress,
 }: {
+  icon: React.ComponentProps<typeof Feather>['name'];
   label: string;
   active: boolean;
   onPress: () => void;
 }) {
   return (
-    <Pressable style={[styles.tabButton, active && styles.tabButtonActive]} onPress={onPress}>
+    <Pressable
+      style={[styles.tabButton, active && styles.tabButtonActive]}
+      onPress={() => {
+        Haptics.selectionAsync();
+        onPress();
+      }}
+    >
+      <Feather name={icon} size={15} color={active ? palette.night1 : colors.textDim} />
       <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{label}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+  },
   root: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    letterSpacing: 0.5,
   },
   content: {
     flex: 1,
   },
+  tabBarWrap: {
+    paddingHorizontal: space.xl,
+    paddingBottom: space.md,
+    paddingTop: space.xs,
+  },
   tabBar: {
     flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-    backgroundColor: colors.card,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderColor: colors.hairline,
+    borderWidth: 1,
+    borderRadius: radius.pill,
+    padding: 4,
+    gap: 4,
   },
   tabButton: {
-    flex: 1,
-    paddingVertical: 14,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 7,
+    paddingVertical: 10,
+    paddingHorizontal: 22,
+    borderRadius: radius.pill,
   },
   tabButtonActive: {
-    borderTopWidth: 2,
-    borderTopColor: colors.accent,
+    backgroundColor: colors.accent,
   },
   tabLabel: {
+    fontFamily: type.medium,
+    fontSize: 13.5,
     color: colors.textDim,
-    fontSize: 15,
-    fontWeight: '600',
   },
   tabLabelActive: {
-    color: colors.text,
+    color: palette.night1,
+    fontFamily: type.semibold,
   },
 });

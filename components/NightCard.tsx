@@ -1,28 +1,34 @@
+import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { formatDuration, formatNightLabel, formatTime } from '../lib/stats';
-import { colors } from '../lib/theme';
+import { colors, microLabel, space, type } from '../lib/theme';
 import { NightStats } from '../lib/types';
+import { GlassCard } from './ui';
 
 /** Detailed breakdown of a single night. */
 export default function NightCard({ night }: { night: NightStats }) {
   const { session } = night;
   return (
-    <View style={styles.card}>
+    <GlassCard style={styles.card}>
       <View style={styles.headerRow}>
-        <Text style={styles.nightLabel}>Night of {formatNightLabel(session)}</Text>
-        <Text style={styles.sleepTotal}>{formatDuration(night.sleepMs)}</Text>
+        <Text style={microLabel}>{formatNightLabel(session)}</Text>
+        <Text style={styles.duration}>{formatDuration(night.sleepMs)}</Text>
       </View>
 
-      <View style={styles.row}>
-        <Stat label="To bed" value={formatTime(session.bedTime)} />
-        <Stat label="Fell asleep" value={formatTime(session.sleepTime)} />
-        <Stat label="Woke up" value={formatTime(session.wakeTime!)} />
+      <View style={styles.timelineRow}>
+        <Feather name="moon" size={13} color={colors.textDim} />
+        <Text style={styles.timelineText}>{formatTime(session.sleepTime)}</Text>
+        <View style={styles.timelineLine} />
+        <Text style={styles.timelineText}>{formatTime(session.wakeTime!)}</Text>
+        <Feather name="sun" size={13} color={colors.textDim} />
       </View>
 
-      <View style={styles.row}>
+      <View style={styles.statsRow}>
         <Stat label="In bed" value={formatDuration(night.inBedMs)} />
-        <Stat label="Asleep" value={formatDuration(night.sleepMs)} />
+        <View style={styles.divider} />
+        <Stat label="To bed at" value={formatTime(session.bedTime)} />
+        <View style={styles.divider} />
         <Stat
           label="Awake in bed"
           value={night.awakeMs > 0 ? formatDuration(night.awakeMs) : '—'}
@@ -32,80 +38,90 @@ export default function NightCard({ night }: { night: NightStats }) {
 
       {session.awakeGaps.length > 0 && (
         <View style={styles.gaps}>
-          <Text style={styles.gapsTitle}>Couldn't fall asleep:</Text>
           {session.awakeGaps.map((gap, i) => (
             <Text key={i} style={styles.gapText}>
-              • {formatTime(gap.start)} – {formatTime(gap.end)} ({formatDuration(gap.end - gap.start)} awake)
+              Lay awake {formatTime(gap.start)} – {formatTime(gap.end)} ·{' '}
+              {formatDuration(gap.end - gap.start)}
             </Text>
           ))}
         </View>
       )}
-    </View>
+    </GlassCard>
   );
 }
 
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statLabel}>{label}</Text>
       <Text style={[styles.statValue, highlight && { color: colors.awake }]}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
+    gap: space.md,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  nightLabel: {
+  duration: {
+    fontFamily: type.light,
+    fontSize: 26,
     color: colors.text,
-    fontSize: 15,
-    fontWeight: '700',
   },
-  sleepTotal: {
-    color: colors.sleep,
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  row: {
+  timelineRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+  },
+  timelineText: {
+    fontFamily: type.medium,
+    fontSize: 13.5,
+    color: colors.textDim,
+  },
+  timelineLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.hairline,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   stat: {
     flex: 1,
-    gap: 2,
-  },
-  statLabel: {
-    color: colors.textDim,
-    fontSize: 12,
+    gap: 3,
   },
   statValue: {
+    fontFamily: type.semibold,
+    fontSize: 15,
     color: colors.text,
-    fontSize: 14,
-    fontWeight: '600',
+  },
+  statLabel: {
+    fontFamily: type.regular,
+    fontSize: 11.5,
+    color: colors.textFaint,
+  },
+  divider: {
+    width: 1,
+    height: 26,
+    backgroundColor: colors.hairline,
+    marginRight: space.md,
   },
   gaps: {
     borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-    paddingTop: 10,
+    borderTopColor: colors.hairline,
+    paddingTop: space.sm,
     gap: 4,
   },
-  gapsTitle: {
-    color: colors.awake,
-    fontSize: 13,
-    fontWeight: '600',
-  },
   gapText: {
-    color: colors.textDim,
-    fontSize: 13,
+    fontFamily: type.regular,
+    fontSize: 12.5,
+    color: colors.awake,
+    opacity: 0.85,
   },
 });
