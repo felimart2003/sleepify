@@ -49,6 +49,7 @@ Expo SDK 56, React Native 0.85, React 19, TypeScript, AsyncStorage, Expo LinearG
 
 ## Deployment and privacy
 
-GitHub Actions checks types, runs tests, exports the web app, and deploys to **GitHub Pages** on each push to `main`. This static hosting path is free for this public repository. No environment variables are needed.
+GitHub Actions checks types, runs tests, exports the web app, and deploys to **GitHub Pages** on each push to `master`. This static hosting path is free for this public repository. No environment variables are needed.
 
 Data belongs to the current browser/device; clearing browser data removes it. There is no cloud sync or automatic sleep sensing. Durations are estimates based on button presses. Corrupt or inaccessible saved data is not silently overwritten: the app displays an error and asks you to reload.
+
