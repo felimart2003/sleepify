@@ -28,7 +28,7 @@ export const palette = {
 export const colors = {
   text: '#F4F5FB',
   textDim: '#9FA3C2',
-  textFaint: '#5E6285',
+  textFaint: '#9297BB',
 
   glass: 'rgba(255,255,255,0.045)',
   glassStrong: 'rgba(255,255,255,0.08)',

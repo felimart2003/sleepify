@@ -1,17 +1,19 @@
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { averageMs, formatDuration, recentNights } from '../lib/stats';
+import { averageMs, formatDuration, recentNights, nightStats } from '../lib/stats';
 import { colors, microLabel, space, type } from '../lib/theme';
 import { SleepSession } from '../lib/types';
 import NightCard from './NightCard';
 import WeeklyChart from './WeeklyChart';
 import { GlassCard } from './ui';
 
-export default function HistoryScreen({ sessions }: { sessions: SleepSession[] }) {
+export default function HistoryScreen({ sessions, demo = false }: { sessions: SleepSession[]; demo?: boolean }) {
   const week = recentNights(sessions, 7);
 
-  if (week.length === 0) {
+  const allNights = sessions.map(nightStats).filter(n => n !== null).sort((a, b) => b.session.wakeTime! - a.session.wakeTime!);
+
+  if (allNights.length === 0) {
     return (
       <View style={styles.empty}>
         <View style={styles.emptyIcon}>
@@ -31,6 +33,7 @@ export default function HistoryScreen({ sessions }: { sessions: SleepSession[] }
 
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <Text style={{ color: colors.textDim }}>{demo ? 'Sample week · fictional data, never saved to your history' : 'Your last 7 days'}</Text>
       <View style={styles.summaryRow}>
         <SummaryTile label="Avg sleep" value={formatDuration(avgSleep)} />
         <SummaryTile label="Avg awake" value={formatDuration(avgAwake)} />
@@ -40,7 +43,7 @@ export default function HistoryScreen({ sessions }: { sessions: SleepSession[] }
       <WeeklyChart nights={week} />
 
       <Text style={[microLabel, styles.sectionLabel]}>Night by night</Text>
-      {[...week].reverse().map(night => (
+      {allNights.map(night => (
         <NightCard key={night.session.id} night={night} />
       ))}
     </ScrollView>

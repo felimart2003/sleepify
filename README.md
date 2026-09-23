@@ -1,41 +1,54 @@
-# Sleepify 🌙
+# Sleepify
 
-A simple sleep tracker for Android and iOS, built with Expo (React Native).
+A private sleep journal for web, iOS, and Android. Track when you go to bed, restart the sleep clock when you are still awake, and review your weekly rhythm.
 
-## How it works
+**[Live demo](https://felimart2003.github.io/sleepify/)** · [Source](https://github.com/felimart2003/sleepify)
 
-- **Going to sleep** — press the big moon button when you lie down.
-- **Still can't sleep?** — if you've been lying awake (30 min, an hour, whatever), press this to restart your sleep time from now. The time you spent awake is logged as an "awake in bed" gap for that night.
-- **I'm awake** — press when you wake up to complete the night.
-- **History tab** — last-7-days bar chart (sleep vs. time awake in bed), weekly averages, and a night-by-night breakdown: when you got into bed, when you actually fell asleep, when you woke up, and every period you couldn't sleep.
+## Try it
 
-All data is stored locally on the device (AsyncStorage) — no account, no server.
+Choose **Explore a sample week** to see charts and seven fictional nights immediately. Sample data is temporary and never replaces your own history. Choose **Tonight → Begin sleep → Wake up** to record a real session. The history list retains older nights while summary statistics use the last seven days.
 
-## Running it
+## Features
 
-```bash
-npm install
-npx expo start
+- One-tap bedtime and wake logging, with confirmation before discarding a night.
+- Explicit awake intervals and sleep/time-in-bed breakdowns.
+- Weekly duration chart, averages, and complete session history.
+- Local persistence with schema validation, ordered saves, visible failures, and retry.
+- Dark responsive interface, bundled fonts, keyboard-accessible controls.
+- No accounts, analytics, API keys, backend, or subscriptions.
+
+## Local setup
+
+Requires Node.js 22 and npm.
+
+```sh
+npm ci
+npm run web
 ```
 
-Then scan the QR code with the **Expo Go** app ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) / [iOS](https://apps.apple.com/app/expo-go/id982107779)). The same codebase runs on both platforms.
+For native development use `npm start`, `npm run android`, or `npm run ios` with an Expo SDK 56-compatible environment. iOS native builds require macOS. Native builds were not exercised in this web deployment.
 
-### Building a standalone Android APK
-
-```bash
-npm install -g eas-cli
-eas build --platform android --profile preview
+```sh
+npm run typecheck
+npm test
+npm run build
 ```
 
-(Requires a free Expo account. For iOS, `eas build --platform ios` — needs an Apple Developer account.)
+The web export is in `dist/`. `app.json` sets `experiments.baseUrl` to `/sleepify` for GitHub Pages. When hosting at a domain root, remove that setting and rebuild. To preview the Pages export locally, serve `dist` mounted at `/sleepify/`.
 
-## Project structure
+## Architecture
 
-- `App.tsx` — root: state, persistence wiring, tab bar
-- `components/TonightScreen.tsx` — sleep / still-awake / wake buttons
-- `components/HistoryScreen.tsx` — weekly summary + night list
-- `components/WeeklyChart.tsx` — dependency-free bar chart
-- `components/NightCard.tsx` — per-night breakdown
-- `lib/types.ts` — `SleepSession` / `AwakeGap` data model
-- `lib/storage.ts` — AsyncStorage load/save
-- `lib/stats.ts` — durations, averages, formatting
+Expo SDK 56, React Native 0.85, React 19, TypeScript, AsyncStorage, Expo LinearGradient, and Inter.
+
+- `App.tsx`: session actions, persistence status, sample mode, navigation.
+- `components/`: tonight state, confirmation sheet, history, chart, night details.
+- `lib/storage.ts` / `validation.ts`: ordered writes and runtime data validation.
+- `lib/stats.ts`: pure duration and date calculations.
+- `lib/demo.ts`: clearly identified sample sessions.
+- `test/run.cjs`: regression checks for calculations and malformed stored data.
+
+## Deployment and privacy
+
+GitHub Actions checks types, runs tests, exports the web app, and deploys to **GitHub Pages** on each push to `main`. This static hosting path is free for this public repository. No environment variables are needed.
+
+Data belongs to the current browser/device; clearing browser data removes it. There is no cloud sync or automatic sleep sensing. Durations are estimates based on button presses. Corrupt or inaccessible saved data is not silently overwritten: the app displays an error and asks you to reload.

@@ -26,6 +26,9 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "experiments": {
+      "baseUrl": "/sleepify"
+    }
   }
 }

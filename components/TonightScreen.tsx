@@ -34,7 +34,7 @@ function IdleView({ lastCompleted, onGoToSleep }: Props) {
   const breathe = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.loop(
+    const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(breathe, {
           toValue: 1,
@@ -49,7 +49,9 @@ function IdleView({ lastCompleted, onGoToSleep }: Props) {
           useNativeDriver: true,
         }),
       ]),
-    ).start();
+    );
+    animation.start();
+    return () => animation.stop();
   }, [breathe]);
 
   const scale = breathe.interpolate({ inputRange: [0, 1], outputRange: [1, 1.04] });
@@ -70,9 +72,9 @@ function IdleView({ lastCompleted, onGoToSleep }: Props) {
       <View style={styles.orbWrap}>
         <Animated.View style={[styles.orbGlow, { opacity: glow }]} />
         <Animated.View style={{ transform: [{ scale }] }}>
-          <Pressable
+          <Pressable accessibilityRole="button"
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
               onGoToSleep();
             }}
             style={({ pressed }) => pressed && styles.orbPressed}
@@ -152,9 +154,9 @@ function SleepingView({
       </View>
 
       <View style={styles.sleepActions}>
-        <Pressable
+        <Pressable accessibilityRole="button"
           onPress={() => {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
             onWakeUp();
           }}
           style={({ pressed }) => [styles.wakeWrap, pressed && styles.orbPressed]}
@@ -170,14 +172,14 @@ function SleepingView({
           </LinearGradient>
         </Pressable>
 
-        <Pressable
+        <Pressable accessibilityRole="button"
           onPress={() => setSheet('restart')}
           style={({ pressed }) => [styles.ghostButton, pressed && styles.orbPressed]}
         >
           <Text style={styles.ghostText}>I'm still awake</Text>
         </Pressable>
 
-        <Pressable onPress={() => setSheet('discard')} hitSlop={12}>
+        <Pressable accessibilityRole="button" onPress={() => setSheet('discard')} hitSlop={12}>
           <Text style={styles.discardText}>Discard this night</Text>
         </Pressable>
       </View>

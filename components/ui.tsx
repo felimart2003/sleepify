@@ -79,14 +79,14 @@ export function ConfirmSheet({
           <View style={styles.grabber} />
           <Text style={styles.sheetTitle}>{title}</Text>
           <Text style={styles.sheetMessage}>{message}</Text>
-          <Pressable
+          <Pressable accessibilityRole="button"
             style={({ pressed }) => [
               styles.sheetPrimary,
               destructive && styles.sheetPrimaryDestructive,
               pressed && styles.pressed,
             ]}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
               onConfirm();
             }}
           >
@@ -96,7 +96,7 @@ export function ConfirmSheet({
               {confirmLabel}
             </Text>
           </Pressable>
-          <Pressable
+          <Pressable accessibilityRole="button"
             style={({ pressed }) => [styles.sheetSecondary, pressed && styles.pressed]}
             onPress={onClose}
           >
