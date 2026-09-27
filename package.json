@@ -6,14 +6,14 @@
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "~56.0.11",
-    "expo-font": "~56.0.6",
-    "expo-haptics": "~56.0.3",
-    "expo-linear-gradient": "~56.0.4",
-    "expo-status-bar": "~56.0.4",
+    "expo": "^57.0.25",
+    "expo-font": "~57.0.4",
+    "expo-haptics": "~57.0.3",
+    "expo-linear-gradient": "~57.0.2",
+    "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-native": "0.85.3",
+    "react-native": "0.86.3",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-web": "^0.21.2"
   },
@@ -30,5 +30,10 @@
     "typecheck": "tsc --noEmit",
     "test": "node test/run.cjs"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "xcode": {
+      "uuid": "^11.1.1"
+    }
+  }
 }

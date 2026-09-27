@@ -26,7 +26,7 @@ npm ci
 npm run web
 ```
 
-For native development use `npm start`, `npm run android`, or `npm run ios` with an Expo SDK 56-compatible environment. iOS native builds require macOS. Native builds were not exercised in this web deployment.
+For native development use `npm start`, `npm run android`, or `npm run ios` with an Expo SDK 57-compatible environment. iOS native builds require macOS. Native builds were not exercised in this web deployment.
 
 ```sh
 npm run typecheck
@@ -38,7 +38,7 @@ The web export is in `dist/`. `app.json` sets `experiments.baseUrl` to `/sleepif
 
 ## Architecture
 
-Expo SDK 56, React Native 0.85, React 19, TypeScript, AsyncStorage, Expo LinearGradient, and Inter.
+Expo SDK 57, React Native 0.86, React 19, TypeScript, AsyncStorage, Expo LinearGradient, and Inter.
 
 - `App.tsx`: session actions, persistence status, sample mode, navigation.
 - `components/`: tonight state, confirmation sheet, history, chart, night details.
