@@ -33,7 +33,7 @@ export default function HistoryScreen({ sessions, demo = false }: { sessions: Sl
 
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={{ color: colors.textDim }}>{demo ? 'Sample week · fictional data, never saved to your history' : 'Your last 7 days'}</Text>
+      <Text style={{ color: colors.textDim }}>{demo ? 'Sample week: fictional data, never saved to your history' : 'Your last 7 days'}</Text>
       <View style={styles.summaryRow}>
         <SummaryTile label="Avg sleep" value={formatDuration(avgSleep)} />
         <SummaryTile label="Avg awake" value={formatDuration(avgAwake)} />
